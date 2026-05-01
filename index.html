@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اوقات شرعی</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--parchment:#f5edd6;--gold:#c8941a;--gold-light:#e8b84b;--deep:#2c1a06;--rust:#8b3a0f;--teal:#1a5c52;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--deep);min-height:100vh;font-family:'Noto Naskh Arabic','Amiri',serif;color:#1a1209;display:flex;flex-direction:column;align-items:center;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 10%,rgba(200,148,26,.12) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(26,92,82,.15) 0%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 30px,rgba(200,148,26,.03) 30px,rgba(200,148,26,.03) 31px);pointer-events:none;z-index:0;}
+  .container{position:relative;z-index:1;width:100%;max-width:1120px;padding:2rem 1rem 4rem;}
+  header{text-align:center;padding:2.5rem 1rem 2rem;}
+  .bismillah{font-family:'Amiri',serif;font-size:2rem;color:var(--gold-light);text-shadow:0 2px 12px rgba(200,148,26,.4);margin-bottom:.5rem;display:block;}
+  .star-divider{color:var(--gold);font-size:1.1rem;letter-spacing:.5em;margin:.5rem 0;display:block;opacity:.7;}
+  h1{font-family:'Amiri',serif;font-size:2.4rem;color:var(--parchment);font-weight:700;text-shadow:0 2px 20px rgba(200,148,26,.3);}
+  .subtitle{color:rgba(245,237,214,.55);font-size:.85rem;margin-top:.3rem;font-style:italic;}
+  .arch-top{width:140px;height:4px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:1rem auto 0;border-radius:2px;}
+  .cal-toggle{display:flex;background:rgba(0,0,0,.3);border-radius:8px;overflow:hidden;border:1px solid rgba(200,148,26,.3);margin-bottom:1.4rem;width:fit-content;}
+  .cal-toggle button{padding:.55rem 1.5rem;border:none;background:transparent;color:rgba(245,237,214,.5);font-family:inherit;font-size:.9rem;cursor:pointer;transition:all .2s;}
+  .cal-toggle button.active{background:linear-gradient(135deg,var(--gold),var(--rust));color:white;font-weight:700;}
+  .input-card{background:linear-gradient(145deg,var(--parchment),#ede3c4);border-radius:16px;padding:2rem 2.5rem;margin-bottom:2rem;border:2px solid var(--gold);box-shadow:0 8px 40px rgba(44,26,6,.5),inset 0 1px 0 rgba(255,255,255,.3);position:relative;overflow:hidden;}
+  .input-card::before{content:'☽';position:absolute;top:-10px;left:1.5rem;font-size:5rem;color:rgba(200,148,26,.08);pointer-events:none;}
+  .input-card::after{content:'☽';position:absolute;bottom:-10px;right:1.5rem;font-size:5rem;color:rgba(200,148,26,.08);transform:scaleX(-1);pointer-events:none;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:1rem;align-items:end;}
+  @media(max-width:700px){.form-grid{grid-template-columns:1fr 1fr;}.form-grid .btn-search{grid-column:1/-1;}}
+  .field label{display:block;font-size:.78rem;font-weight:700;color:var(--rust);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;}
+  .field select{width:100%;padding:.7rem 1rem;border:1.5px solid rgba(200,148,26,.4);border-radius:8px;background:rgba(255,255,255,.65);font-family:inherit;font-size:.95rem;color:var(--deep);outline:none;transition:border-color .2s,box-shadow .2s;text-align:right;direction:rtl;}
+  .field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,148,26,.15);}
+  .btn-search{padding:.72rem 2rem;background:linear-gradient(135deg,var(--gold),var(--rust));color:white;border:none;border-radius:8px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(200,148,26,.4);transition:transform .15s,box-shadow .15s;white-space:nowrap;}
+  .btn-search:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(200,148,26,.5);}
+  .info-box{background:linear-gradient(145deg,rgba(245,237,214,.98),rgba(237,227,196,.96));border:1.5px solid rgba(200,148,26,.7);border-radius:12px;padding:1rem 1.25rem;color:var(--deep);font-size:.86rem;margin-top:1.2rem;display:none;line-height:2;text-align:right;box-shadow:inset 0 1px 0 rgba(255,255,255,.45);}
+  .info-box strong{color:var(--rust);}
+  .info-box .formula{direction:ltr;unicode-bidi:embed;color:var(--teal);font-weight:700;}
+  .error-box{background:rgba(139,58,15,.2);border:1px solid var(--rust);border-radius:10px;padding:1rem 1.5rem;color:#ffccaa;display:none;margin-bottom:1.5rem;font-size:.9rem;text-align:center;}
+  .table-wrapper{display:none;animation:fadeIn .5s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .table-title{font-family:'Amiri',serif;font-size:1.6rem;color:var(--gold-light);text-align:center;margin-bottom:.3rem;text-shadow:0 2px 10px rgba(200,148,26,.3);}
+  .table-subtitle{text-align:center;color:rgba(245,237,214,.4);font-size:.78rem;margin-bottom:1.2rem;font-style:italic;}
+  .table-scroll{overflow-x:auto;border-radius:14px;box-shadow:0 10px 50px rgba(44,26,6,.6);}
+  table{width:100%;min-width:1120px;border-collapse:collapse;background:linear-gradient(180deg,#1e1108,#160d05);font-size:.87rem;}
+  thead tr{background:linear-gradient(90deg,var(--rust),var(--gold),var(--teal));}
+  th{padding:.85rem .55rem;color:white;font-weight:700;font-size:.77rem;text-align:center;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.3);}
+  th small{font-weight:400;font-size:.68rem;display:block;opacity:.8;direction:ltr;}
+  td{padding:.58rem .55rem;text-align:center;color:var(--parchment);border-bottom:1px solid rgba(200,148,26,.08);white-space:nowrap;}
+  tbody tr:hover{background:rgba(200,148,26,.1)!important;}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.02);}
+  tbody tr.today-row{background:rgba(232,184,75,.22)!important;outline:2px solid rgba(232,184,75,.75);outline-offset:-2px;}
+  tbody tr.today-row td{color:#fff3c4;font-weight:700;}
+
+  td.day-col{font-weight:700;color:var(--gold-light);font-size:.82rem;}
+  td.date-col{font-size:.74rem;color:rgba(245,237,214,.4);direction:ltr;}
+  td.time-col{font-variant-numeric:tabular-nums;font-size:.88rem;direction:ltr;}
+  td.asr-col{color:#a8d8b0;}
+  td.isha-col{color:#a0c4e8;}
+  .ornament{text-align:center;color:var(--gold);font-size:1.2rem;letter-spacing:.8em;margin:1.5rem 0;opacity:.4;}
+  footer{margin-top:3rem;text-align:center;color:rgba(245,237,214,.3);font-size:.75rem;letter-spacing:.08em;}
+  footer strong{color:rgba(200,148,26,.6);}
+
+  .tools-card{background:linear-gradient(145deg,var(--parchment),#ede3c4);border-radius:16px;padding:1.4rem 1.6rem;margin-bottom:2rem;border:2px solid rgba(200,148,26,.75);box-shadow:0 8px 35px rgba(44,26,6,.42),inset 0 1px 0 rgba(255,255,255,.28);}
+  .tools-title{font-family:'Amiri',serif;color:var(--rust);font-size:1.25rem;font-weight:700;margin-bottom:.8rem;text-align:center;}
+  .tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;}
+  @media(max-width:800px){.tools-grid{grid-template-columns:1fr;}}
+  .tool-btn{padding:.75rem 1rem;background:linear-gradient(135deg,var(--gold),var(--rust));color:white;border:none;border-radius:8px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(200,148,26,.34);}
+  .tool-btn.secondary{background:linear-gradient(135deg,var(--teal),#0d3b36);}
+  .tool-note{font-size:.78rem;color:rgba(44,26,6,.72);line-height:1.8;margin-top:.8rem;text-align:center;}
+  .notify-panel{display:none;margin-top:1rem;background:rgba(255,255,255,.55);border:1px solid rgba(200,148,26,.38);border-radius:12px;padding:1rem;}
+  .notify-panel.show{display:block;}
+  .notify-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;}
+  @media(max-width:800px){.notify-grid{grid-template-columns:1fr 1fr;}}
+  .notify-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;background:rgba(245,237,214,.75);border:1px solid rgba(200,148,26,.25);border-radius:8px;padding:.55rem .7rem;font-size:.82rem;color:var(--deep);}
+  .notify-item input{accent-color:var(--rust);transform:scale(1.15);}
+  .install-hint{display:none;margin-top:.8rem;color:var(--teal);font-weight:700;text-align:center;font-size:.85rem;}
+  .install-hint.show{display:block;}
+  @media print{
+    body{background:white!important;color:black!important;display:block;}
+    body::before, header, .input-card, .tools-card, .ornament, footer, .error-box, .info-box{display:none!important;}
+    .container{max-width:none!important;padding:0!important;}
+    .table-wrapper{display:block!important;}
+    .table-title{color:black!important;text-shadow:none!important;margin-top:0!important;}
+    .table-subtitle{color:#333!important;}
+    .table-scroll{box-shadow:none!important;overflow:visible!important;border-radius:0!important;}
+    table{min-width:0!important;width:100%!important;background:white!important;color:black!important;font-size:10px!important;}
+    thead tr{background:#ddd!important;}
+    th{color:black!important;text-shadow:none!important;border:1px solid #888!important;padding:5px 3px!important;}
+    td{color:black!important;border:1px solid #aaa!important;padding:4px 3px!important;}
+    td.day-col,td.date-col,td.time-col,td.asr-col,td.isha-col{color:black!important;}
+    tbody tr.today-row{background:#fff3bf!important;outline:2px solid #000!important;}
+    @page{size:A4 landscape;margin:10mm;}
+  }
+
+</style>
+
+<link rel="manifest" href="oghat_manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<meta name="theme-color" content="#2c1a06">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="اوقات شرعی">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+</head>
+<body>
+<div class="container">
+  <header>
+    <span class="bismillah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</span>
+    <span class="star-divider">✦ ✦ ✦</span>
+    <h1>اوقات شرعی</h1>
+    <p class="subtitle">محاسبه نجومی دقیق — NREL SPA / NOAA / Jean Meeus</p>
+    <div class="arch-top"></div>
+  </header>
+
+  <div class="input-card">
+    <div style="display:flex;justify-content:center;">
+      <div class="cal-toggle">
+        <button id="btnShamsi" class="active" onclick="setCalType('shamsi')">📅 تقویم شمسی</button>
+        <button id="btnMiladi" onclick="setCalType('miladi')">🗓️ تقویم میلادی</button>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>کشور</label>
+        <select id="country" onchange="populateCities()">
+          <option value="">انتخاب کشور...</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>شهر</label>
+        <select id="city">
+          <option value="">ابتدا کشور انتخاب کنید</option>
+        </select>
+      </div>
+      <div class="field">
+        <label id="monthLabel">ماه شمسی</label>
+        <select id="month"></select>
+      </div>
+      <button class="btn-search" onclick="calculate()">محاسبه اوقات ←</button>
+    </div>
+    <div class="info-box" id="infoBox"></div>
+  </div>
+
+
+  <div class="tools-card">
+    <div class="tools-title">ابزارهای ماهانه و اپ موبایل</div>
+    <div class="tools-grid">
+      <button class="tool-btn" onclick="printMonthPDF()">چاپ / ذخیره PDF ماه</button>
+      <button class="tool-btn secondary" onclick="toggleNotifyPanel()">تنظیم یادآورها</button>
+      <button class="tool-btn secondary" onclick="installPWA()">نصب مثل اپ موبایل</button>
+    </div>
+    <div class="tool-note">
+      برای PDF، ابتدا کشور/شهر/ماه را محاسبه کن و سپس دکمه چاپ را بزن. در پنجره چاپ می‌توانی Save as PDF را انتخاب کنی.
+    </div>
+    <div class="install-hint" id="installHint">اگر دکمه نصب عمل نکرد، از منوی مرورگر گزینه Add to Home Screen / Install app را بزن.</div>
+    <div class="notify-panel" id="notifyPanel">
+      <div class="tool-note" style="margin-top:0">
+        یادآورها روی همین دستگاه ذخیره می‌شوند. برای عملکرد بهتر، نسخه PWA را نصب کن و اجازه Notification بده.
+      </div>
+      <div class="notify-grid">
+        <label class="notify-item">شروع روزه <input type="checkbox" data-notify="fastStart"></label>
+        <label class="notify-item">نماز صبح <input type="checkbox" data-notify="fajr"></label>
+        <label class="notify-item">نماز ظهر <input type="checkbox" data-notify="noon"></label>
+        <label class="notify-item">نماز عصر <input type="checkbox" data-notify="asr"></label>
+        <label class="notify-item">نماز مغرب <input type="checkbox" data-notify="maghrib"></label>
+        <label class="notify-item">پایان روز <input type="checkbox" data-notify="dayEnd"></label>
+        <label class="notify-item">یک‌سوم شب <input type="checkbox" data-notify="nightThird"></label>
+        <label class="notify-item">نماز عشا <input type="checkbox" data-notify="isha"></label>
+        <label class="notify-item">دو‌سوم شب <input type="checkbox" data-notify="nightTwoThirds"></label>
+      </div>
+      <button class="tool-btn" onclick="saveNotificationSettings()">ذخیره یادآورها</button>
+      <div class="tool-note" id="notifyStatus"></div>
+    </div>
+  </div>
+
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="table-wrapper" id="tableWrapper">
+    <div class="ornament">✦ ✧ ✦</div>
+    <div class="table-title" id="tableTitle"></div>
+    <div class="table-subtitle" id="tableSubtitle"></div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>روز</th>
+            <th>تاریخ میلادی</th>
+            <th>🌙 شروع روزه<br><small>Nautical Twilight · -12°</small></th>
+            <th>🕌 نماز صبح<br><small>Blue Hour Start · -8°</small></th>
+            <th>☀️ نماز ظهر<br><small>Solar Noon</small></th>
+            <th>🕋 نماز عصر<br><small>میانه ظهر و مغرب</small></th>
+            <th>🌅 نماز مغرب<br><small>Sunset · -0.833°</small></th>
+            <th>🌆 پایان روز<br><small>Nautical Twilight · -12°</small></th>
+            <th>⅓ یک‌سوم شب<br><small>Night / 3</small></th>
+            <th>🌌 نماز عشا<br><small>Solar Noon + 12h</small></th>
+            <th>⅔ دو‌سوم شب<br><small>2 × Night / 3</small></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div class="ornament">✦ ✧ ✦</div>
+  </div>
+
+  <footer>
+    <p>created by <strong>Hessam</strong> &nbsp;|&nbsp; NREL SPA / NOAA / Jean Meeus</p>
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  CITY DATABASE
+//  هر کشور یک IANA time zone دارد. برای شهرهایی مثل آمریکا/کانادا می‌توان tz مخصوص شهر گذاشت.
+// ══════════════════════════════════════════
+const COUNTRIES = {
+  "ایران":{tz:"Asia/Tehran",cities:{
+    "تهران":{en:"Tehran",lat:35.6892,lng:51.3890},
+    "سبزوار":{en:"Sabzevar",lat:36.2126,lng:57.6819},
+    "تنکابن":{en:"Tonekabon",lat:36.8163,lng:50.8738},"کرج":{en:"Karaj",lat:35.8327,lng:50.9915},"مشهد":{en:"Mashhad",lat:36.2605,lng:59.6168},
+    "اصفهان":{en:"Isfahan",lat:32.6546,lng:51.6680},"شیراز":{en:"Shiraz",lat:29.5918,lng:52.5837},"تبریز":{en:"Tabriz",lat:38.0962,lng:46.2738},
+    "اهواز":{en:"Ahvaz",lat:31.3183,lng:48.6706},"رشت":{en:"Rasht",lat:37.2808,lng:49.5832},"کرمانشاه":{en:"Kermanshah",lat:34.3277,lng:47.0778},
+    "سنندج":{en:"Sanandaj",lat:35.3149,lng:46.9988},"سقز":{en:"Saqqez",lat:36.2499,lng:46.2735},"بانه":{en:"Baneh",lat:35.9975,lng:45.8853},
+    "مریوان":{en:"Marivan",lat:35.5269,lng:46.1760},"قروه":{en:"Qorveh",lat:35.1679,lng:47.8038},"بیجار":{en:"Bijar",lat:35.8668,lng:47.6051},
+    "کامیاران":{en:"Kamyaran",lat:34.7956,lng:46.9355},"دهگلان":{en:"Dehgolan",lat:35.2797,lng:47.4189},"دیواندره":{en:"Divandarreh",lat:35.9139,lng:47.0239},
+    "سروآباد":{en:"Sarvabad",lat:35.3125,lng:46.3667},"اورامان تخت":{en:"Hawraman Takht",lat:35.2510,lng:46.2660},
+    "اسلام‌آباد غرب":{en:"Eslamabad-e Gharb",lat:34.1094,lng:46.5275},"جوانرود":{en:"Javanrud",lat:34.8067,lng:46.4886},"پاوه":{en:"Paveh",lat:35.0434,lng:46.3565},
+    "سرپل ذهاب":{en:"Sarpol-e Zahab",lat:34.4611,lng:45.8628},"قصر شیرین":{en:"Qasr-e Shirin",lat:34.5156,lng:45.5791},"کنگاور":{en:"Kangavar",lat:34.5043,lng:47.9653},
+    "سنقر":{en:"Sonqor",lat:34.7837,lng:47.6004},"هرسین":{en:"Harsin",lat:34.2721,lng:47.5861},"صحنه":{en:"Sahneh",lat:34.4813,lng:47.6908},
+    "روانسر":{en:"Ravansar",lat:34.7153,lng:46.6519},"دالاهو":{en:"Dalahu",lat:34.2842,lng:46.2423},"گیلانغرب":{en:"Gilan-e Gharb",lat:34.1421,lng:45.9203},
+    "قم":{en:"Qom",lat:34.6399,lng:50.8764},"بندرعباس":{en:"Bandar Abbas",lat:27.1832,lng:56.2666},"همدان":{en:"Hamadan",lat:34.7990,lng:48.5150},
+    "کرمان":{en:"Kerman",lat:30.2839,lng:57.0834},"یزد":{en:"Yazd",lat:31.8974,lng:54.3569},"اردبیل":{en:"Ardabil",lat:38.2498,lng:48.2933}
+  }},
+  "آلمان":{tz:"Europe/Berlin",cities:{
+    "هامبورگ":{en:"Hamburg",lat:53.5511,lng:9.9937},"برلین":{en:"Berlin",lat:52.5200,lng:13.4050},"مونیخ":{en:"Munich",lat:48.1351,lng:11.5820},
+    "فرانکفورت":{en:"Frankfurt",lat:50.1109,lng:8.6821},"کلن":{en:"Cologne",lat:50.9375,lng:6.9603},"اشتوتگارت":{en:"Stuttgart",lat:48.7758,lng:9.1829},
+    "دوسلدورف":{en:"Dusseldorf",lat:51.2277,lng:6.7735},"لایپزیگ":{en:"Leipzig",lat:51.3397,lng:12.3731},"ارفورت":{en:"Erfurt",lat:50.9848,lng:11.0299},
+    "هانوفر":{en:"Hanover",lat:52.3759,lng:9.7320},"Lauenburg/Elbe":{en:"Lauenburg/Elbe",lat:53.3719,lng:10.5569},"برمن":{en:"Bremen",lat:53.0793,lng:8.8017},
+    "نورنبرگ":{en:"Nuremberg",lat:49.4521,lng:11.0767},"درسدن":{en:"Dresden",lat:51.0504,lng:13.7373},"بون":{en:"Bonn",lat:50.7374,lng:7.0982}
+  }},
+  "ترکیه":{tz:"Europe/Istanbul",cities:{
+    "استانبول":{en:"Istanbul",lat:41.0082,lng:28.9784},"آنکارا":{en:"Ankara",lat:39.9334,lng:32.8597},"ازمیر":{en:"Izmir",lat:38.4237,lng:27.1428},
+    "بورسا":{en:"Bursa",lat:40.1885,lng:29.0610},"آنتالیا":{en:"Antalya",lat:36.8969,lng:30.7133},"قونیه":{en:"Konya",lat:37.8746,lng:32.4932},
+    "آدانا":{en:"Adana",lat:37.0000,lng:35.3213},"غازی‌عینتاب":{en:"Gaziantep",lat:37.0662,lng:37.3833},"دیاربکر":{en:"Diyarbakir",lat:37.9144,lng:40.2306},
+    "ماردین":{en:"Mardin",lat:37.3122,lng:40.7351},"وان":{en:"Van",lat:38.5012,lng:43.3730},"ارزروم":{en:"Erzurum",lat:39.9000,lng:41.2700},
+    "ترابزون":{en:"Trabzon",lat:41.0027,lng:39.7168}
+  }},
+  "عراق":{tz:"Asia/Baghdad",cities:{
+    "بغداد":{en:"Baghdad",lat:33.3152,lng:44.3661},"اربیل":{en:"Erbil",lat:36.1901,lng:43.9930},"سلیمانیه":{en:"Sulaymaniyah",lat:35.5558,lng:45.4351},
+    "دهوک":{en:"Duhok",lat:36.8662,lng:42.9885},"کرکوک":{en:"Kirkuk",lat:35.4676,lng:44.3922},"موصل":{en:"Mosul",lat:36.3489,lng:43.1577},
+    "بصره":{en:"Basra",lat:30.5081,lng:47.7835},"نجف":{en:"Najaf",lat:32.0259,lng:44.3463},"کربلا":{en:"Karbala",lat:32.6160,lng:44.0249}
+  }},
+  "سوریه":{tz:"Asia/Damascus",cities:{
+    "دمشق":{en:"Damascus",lat:33.5138,lng:36.2765},"حلب":{en:"Aleppo",lat:36.2021,lng:37.1343},"حمص":{en:"Homs",lat:34.7324,lng:36.7137},
+    "حماة":{en:"Hama",lat:35.1318,lng:36.7578},"لاذقیه":{en:"Latakia",lat:35.5317,lng:35.7901},"قامشلی":{en:"Qamishli",lat:37.0500,lng:41.2200},
+    "کوبانی":{en:"Kobani",lat:36.8910,lng:38.3535},"عفرین":{en:"Afrin",lat:36.5119,lng:36.8695}
+  }},
+  "اسرائیل":{tz:"Asia/Jerusalem",cities:{
+    "اورشلیم":{en:"Jerusalem",lat:31.7683,lng:35.2137},"تل‌آویو":{en:"Tel Aviv",lat:32.0853,lng:34.7818},"حیفا":{en:"Haifa",lat:32.7940,lng:34.9896},
+    "بئرشبع":{en:"Beersheba",lat:31.2530,lng:34.7915},"ایلات":{en:"Eilat",lat:29.5577,lng:34.9519},"ناصرة":{en:"Nazareth",lat:32.6996,lng:35.3035}
+  }},
+  "سوئد":{tz:"Europe/Stockholm",cities:{
+    "استکهلم":{en:"Stockholm",lat:59.3293,lng:18.0686},"گوتنبرگ":{en:"Gothenburg",lat:57.7089,lng:11.9746},"مالمو":{en:"Malmo",lat:55.6050,lng:13.0038},
+    "اوپسالا":{en:"Uppsala",lat:59.8586,lng:17.6389},"اومئو":{en:"Umea",lat:63.8258,lng:20.2630},"لوند":{en:"Lund",lat:55.7047,lng:13.1910}
+  }},
+  "ایتالیا":{tz:"Europe/Rome",cities:{
+    "رم":{en:"Rome",lat:41.9028,lng:12.4964},"میلان":{en:"Milan",lat:45.4642,lng:9.1900},"ناپل":{en:"Naples",lat:40.8518,lng:14.2681},
+    "تورین":{en:"Turin",lat:45.0703,lng:7.6869},"پالرمو":{en:"Palermo",lat:38.1157,lng:13.3615},"فلورانس":{en:"Florence",lat:43.7696,lng:11.2558},
+    "ونیز":{en:"Venice",lat:45.4408,lng:12.3155}
+  }},
+  "اتریش":{tz:"Europe/Vienna",cities:{
+    "وین":{en:"Vienna",lat:48.2082,lng:16.3738},"گراتس":{en:"Graz",lat:47.0707,lng:15.4395},"لینتس":{en:"Linz",lat:48.3069,lng:14.2858},
+    "زالتسبورگ":{en:"Salzburg",lat:47.8095,lng:13.0550},"اینسبروک":{en:"Innsbruck",lat:47.2692,lng:11.4041},"کلاگنفورت":{en:"Klagenfurt",lat:46.6247,lng:14.3053}
+  }},
+  "انگلستان":{tz:"Europe/London",cities:{"لندن":{en:"London",lat:51.5074,lng:-0.1278},"منچستر":{en:"Manchester",lat:53.4808,lng:-2.2426},"شفیلد":{en:"Sheffield",lat:53.3811,lng:-1.4701},"اکستر":{en:"Exeter",lat:50.7184,lng:-3.5339},"بیرمنگام":{en:"Birmingham",lat:52.4862,lng:-1.8904},"لیدز":{en:"Leeds",lat:53.8008,lng:-1.5491},"لیورپول":{en:"Liverpool",lat:53.4084,lng:-2.9916},"بریستول":{en:"Bristol",lat:51.4545,lng:-2.5879},"ناتینگهام":{en:"Nottingham",lat:52.9548,lng:-1.1581},"لستر":{en:"Leicester",lat:52.6369,lng:-1.1398},"آکسفورد":{en:"Oxford",lat:51.752,lng:-1.2577},"کمبریج":{en:"Cambridge",lat:52.2053,lng:0.1218},"یورک":{en:"York",lat:53.959,lng:-1.0815},"نیوکاسل":{en:"Newcastle",lat:54.9783,lng:-1.6178},"ساوتهمپتون":{en:"Southampton",lat:50.9097,lng:-1.4044},"پلیموث":{en:"Plymouth",lat:50.3755,lng:-4.1427},"ردینگ":{en:"Reading",lat:51.4543,lng:-0.9781},"دربی":{en:"Derby",lat:52.9225,lng:-1.4746},"کاونتری":{en:"Coventry",lat:52.4068,lng:-1.5197},"هال":{en:"Hull",lat:53.7676,lng:-0.3274}}},
+  "فرانسه":{tz:"Europe/Paris",cities:{"پاریس":{en:"Paris",lat:48.8566,lng:2.3522},"مارسی":{en:"Marseille",lat:43.2965,lng:5.3698}}},
+  "هلند":{tz:"Europe/Amsterdam",cities:{"آمستردام":{en:"Amsterdam",lat:52.3676,lng:4.9041},"روتردام":{en:"Rotterdam",lat:51.9244,lng:4.4777}}},
+  "سوئیس":{tz:"Europe/Zurich",cities:{"زوریخ":{en:"Zurich",lat:47.3769,lng:8.5417},"ژنو":{en:"Geneva",lat:46.2044,lng:6.1432}}},
+  "امارات":{tz:"Asia/Dubai",cities:{"دبی":{en:"Dubai",lat:25.2048,lng:55.2708},"ابوظبی":{en:"Abu Dhabi",lat:24.4539,lng:54.3773}}},
+  "عربستان سعودی":{tz:"Asia/Riyadh",cities:{"مکه":{en:"Mecca",lat:21.3891,lng:39.8579},"مدینه":{en:"Medina",lat:24.5247,lng:39.5692},"ریاض":{en:"Riyadh",lat:24.7136,lng:46.6753}}},
+  "آمریکا":{tz:"America/New_York",cities:{
+    "نیویورک":{en:"New York",lat:40.7128,lng:-74.0060,tz:"America/New_York"},"لس آنجلس":{en:"Los Angeles",lat:34.0522,lng:-118.2437,tz:"America/Los_Angeles"},
+    "شیکاگو":{en:"Chicago",lat:41.8781,lng:-87.6298,tz:"America/Chicago"},"واشنگتن":{en:"Washington DC",lat:38.9072,lng:-77.0369,tz:"America/New_York"}
+  }},
+  "کانادا":{tz:"America/Toronto",cities:{
+    "تورنتو":{en:"Toronto",lat:43.6532,lng:-79.3832,tz:"America/Toronto"},"مونترال":{en:"Montreal",lat:45.5017,lng:-73.5673,tz:"America/Toronto"},
+    "ونکوور":{en:"Vancouver",lat:49.2827,lng:-123.1207,tz:"America/Vancouver"}
+  }}
+
+  ,
+  "هنگ کنگ":{tz:"Asia/Hong_Kong",cities:{
+    "هنگ کنگ":{en:"Hong Kong",lat:22.3193,lng:114.1694},
+    "کولون":{en:"Kowloon",lat:22.3167,lng:114.1833},
+    "نیو تریتوریز":{en:"New Territories",lat:22.4000,lng:114.2000},
+    "شا تین":{en:"Sha Tin",lat:22.3833,lng:114.1833},
+    "تسوئن وان":{en:"Tsuen Wan",lat:22.3700,lng:114.1100},
+    "توئن مون":{en:"Tuen Mun",lat:22.3916,lng:113.9771},
+    "یوئن لانگ":{en:"Yuen Long",lat:22.4456,lng:114.0222},
+    "تای پو":{en:"Tai Po",lat:22.4500,lng:114.1667},
+    "کوای چونگ":{en:"Kwai Chung",lat:22.3667,lng:114.1333},
+    "تسونگ کوان او":{en:"Tseung Kwan O",lat:22.3167,lng:114.2667},
+    "سای کونگ":{en:"Sai Kung",lat:22.3833,lng:114.2667},
+    "سنترال":{en:"Central",lat:22.2819,lng:114.1589},
+    "وان چای":{en:"Wan Chai",lat:22.2770,lng:114.1750},
+    "کازوی بی":{en:"Causeway Bay",lat:22.2800,lng:114.1830},
+    "ابردین":{en:"Aberdeen",lat:22.2470,lng:114.1550},
+    "مونگ کوک":{en:"Mong Kok",lat:22.3193,lng:114.1694},
+    "تسیم شا تسوی":{en:"Tsim Sha Tsui",lat:22.2964,lng:114.1722}
+  }}
+
+};
+
+const SHAMSI_MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const MILADI_FA = ['ژانویه','فوریه','مارس','آوریل','مه','ژوئن','ژوئیه','اوت','سپتامبر','اکتبر','نوامبر','دسامبر'];
+const MILADI_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const J_DAYS_IN_MONTH = [31,31,31,31,31,31,30,30,30,30,30,29];
+const G_DAYS_IN_MONTH = [31,28,31,30,31,30,31,31,30,31,30,31];
+
+function j2g(jy, jm, jd) {
+  var jy2 = jy - 979, jm2 = jm - 1;
+  var j_day_no = 365*jy2 + Math.floor(jy2/33)*8 + Math.floor((jy2%33+3)/4);
+  for (var i=0; i<jm2; i++) j_day_no += J_DAYS_IN_MONTH[i];
+  j_day_no += jd - 1;
+  var g_day_no = j_day_no + 79;
+  var gy = 1600 + 400*Math.floor(g_day_no/146097);
+  g_day_no %= 146097;
+  var leap = true;
+  if (g_day_no >= 36525) {
+    g_day_no--;
+    gy += 100*Math.floor(g_day_no/36524);
+    g_day_no %= 36524;
+    if (g_day_no >= 365) g_day_no++; else leap = false;
+  }
+  gy += 4*Math.floor(g_day_no/1461);
+  g_day_no %= 1461;
+  if (g_day_no >= 366) { leap = false; g_day_no--; gy += Math.floor(g_day_no/365); g_day_no %= 365; }
+  var gm = 0;
+  for (var i=0; i<12; i++) {
+    var dim = G_DAYS_IN_MONTH[i] + (i===1 && leap ? 1 : 0);
+    if (g_day_no < dim) break;
+    g_day_no -= dim; gm++;
+  }
+  return { gy: gy, gm: gm+1, gd: g_day_no+1 };
+}
+function g2j(gy, gm, gd) {
+  var g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+  var gy2 = (gm > 2) ? gy + 1 : gy;
+  var days = 355666 + (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+  var jy = -1595 + 33 * Math.floor(days / 12053);
+  days %= 12053;
+  jy += 4 * Math.floor(days / 1461);
+  days %= 1461;
+  if (days > 365) { jy += Math.floor((days - 1) / 365); days = (days - 1) % 365; }
+  var jm, jd;
+  if (days < 186) { jm = 1 + Math.floor(days / 31); jd = 1 + (days % 31); }
+  else { jm = 7 + Math.floor((days - 186) / 30); jd = 1 + ((days - 186) % 30); }
+  return { jy, jm, jd };
+}
+function isJLeap(jy){ return j2g(jy,12,30).gm === 3; }
+function jDaysInMonth(jy,jm){ if(jm<=6)return 31; if(jm<=11)return 30; return isJLeap(jy)?30:29; }
+function currentJY(){ var d=new Date(); return g2j(d.getFullYear(),d.getMonth()+1,d.getDate()).jy; }
+function currentJM(){ var d=new Date(); return g2j(d.getFullYear(),d.getMonth()+1,d.getDate()).jm; }
+
+function getTimeZoneOffsetHours(y,m,d,timeZone){
+  var utcNoon = new Date(Date.UTC(y, m-1, d, 12, 0, 0));
+  var dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone, year:'numeric', month:'2-digit', day:'2-digit',
+    hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'
+  });
+  var parts = {};
+  dtf.formatToParts(utcNoon).forEach(function(p){ if(p.type !== 'literal') parts[p.type] = p.value; });
+  var localAsUTC = Date.UTC(+parts.year, +parts.month-1, +parts.day, +parts.hour, +parts.minute, +parts.second);
+  return (localAsUTC - utcNoon.getTime()) / 3600000;
+}
+
+function dayOfYear(y,m,d){
+  return Math.floor((Date.UTC(y,m-1,d) - Date.UTC(y,0,0)) / 86400000);
+}
+
+// محاسبه خورشیدی دقیق عملی برای جدول ماهانه:
+// مدل NREL/NOAA بر پایه Jean Meeus: Equation of Time + Solar Declination + IANA Time Zone.
+// این روش برای کاربردهای روزانه معمولاً اختلافی در حد حدود یک دقیقه با منابع نجومی معتبر دارد.
+function sunCalc(year, month, day, lat, lng, timeZone) {
+  var n = dayOfYear(year, month, day);
+  var gamma = 2 * Math.PI / 365 * (n - 1);
+  var eqTime = 229.18 * (
+    0.000075 +
+    0.001868 * Math.cos(gamma) -
+    0.032077 * Math.sin(gamma) -
+    0.014615 * Math.cos(2 * gamma) -
+    0.040849 * Math.sin(2 * gamma)
+  );
+  var decl = 0.006918 -
+    0.399912 * Math.cos(gamma) +
+    0.070257 * Math.sin(gamma) -
+    0.006758 * Math.cos(2 * gamma) +
+    0.000907 * Math.sin(2 * gamma) -
+    0.002697 * Math.cos(3 * gamma) +
+    0.00148 * Math.sin(3 * gamma);
+
+  var tzOff = getTimeZoneOffsetHours(year, month, day, timeZone);
+  var noon = 720 - 4 * lng - eqTime + tzOff * 60;
+
+  function timeAtAltitude(altDeg, rising) {
+    var latR = lat * Math.PI / 180;
+    var altR = altDeg * Math.PI / 180;
+    var cosH = (Math.sin(altR) - Math.sin(latR) * Math.sin(decl)) / (Math.cos(latR) * Math.cos(decl));
+    if (cosH > 1 || cosH < -1) return null;
+    var hourAngle = Math.acos(cosH) * 180 / Math.PI;
+    var delta = 4 * hourAngle;
+    return rising ? noon - delta : noon + delta;
+  }
+
+  return {
+    noon: noon,
+    set: timeAtAltitude(-0.833, false),
+    nautMorn: timeAtAltitude(-12, true),
+    nautEve: timeAtAltitude(-12, false),
+    blueMorn: timeAtAltitude(-8, true),
+    tzOff: tzOff
+  };
+}
+function norm(m){ return ((m % 1440) + 1440) % 1440; }
+function fmtMin(m) {
+  if (m === null || isNaN(m)) return '–';
+  m = Math.round(norm(m));
+  return String(Math.floor(m/60)).padStart(2,'0') + ':' + String(m%60).padStart(2,'0');
+}
+
+var calType = 'shamsi';
+
+function setCalType(t) {
+  calType = t;
+  document.getElementById('btnShamsi').classList.toggle('active', t==='shamsi');
+  document.getElementById('btnMiladi').classList.toggle('active', t==='miladi');
+  document.getElementById('monthLabel').textContent = t==='shamsi' ? 'ماه شمسی' : 'ماه میلادی';
+  populateMonths();
+  document.getElementById('infoBox').style.display = 'none';
+  document.getElementById('tableWrapper').style.display = 'none';
+  setError('');
+}
+
+function populateMonths() {
+  var sel = document.getElementById('month');
+  sel.innerHTML = '';
+  var months = calType === 'shamsi' ? SHAMSI_MONTHS : MILADI_FA;
+  var cur = calType === 'shamsi' ? currentJM() - 1 : new Date().getMonth();
+  for (var i = 0; i < months.length; i++) {
+    var opt = document.createElement('option');
+    opt.value = i + 1;
+    opt.textContent = months[i];
+    if (i === cur) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+function populateCountries() {
+  var sel = document.getElementById('country');
+  Object.keys(COUNTRIES).forEach(function(c) {
+    var opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    sel.appendChild(opt);
+  });
+}
+
+function populateCities() {
+  var country = document.getElementById('country').value;
+  var sel = document.getElementById('city');
+  sel.innerHTML = '';
+  if (!country || !COUNTRIES[country]) {
+    sel.innerHTML = '<option value="">ابتدا کشور انتخاب کنید</option>';
+    return;
+  }
+  Object.keys(COUNTRIES[country].cities).forEach(function(name) {
+    var opt = document.createElement('option');
+    opt.value = name; opt.textContent = name;
+    sel.appendChild(opt);
+  });
+}
+
+function buildDayList(monthNum) {
+  var now = new Date();
+  if (calType === 'miladi') {
+    var gy = now.getFullYear();
+    var total = new Date(gy, monthNum, 0).getDate();
+    var days = [];
+    for (var d = 1; d <= total; d++) {
+      days.push({ dayNum: d, gy: gy, gm: monthNum, gd: d, label: d + ' ' + MILADI_EN[monthNum-1].slice(0,3) });
+    }
+    return { days: days, monthFa: MILADI_FA[monthNum-1], year: gy, isShamsi: false };
+  }
+  var jy = currentJY();
+  var total = jDaysInMonth(jy, monthNum);
+  var days = [];
+  for (var d = 1; d <= total; d++) {
+    var g = j2g(jy, monthNum, d);
+    days.push({ dayNum: d, gy: g.gy, gm: g.gm, gd: g.gd, label: g.gd + ' ' + MILADI_EN[g.gm-1].slice(0,3) });
+  }
+  var f = days[0], l = days[days.length-1];
+  return {
+    days: days, monthFa: SHAMSI_MONTHS[monthNum-1], jYear: jy, isShamsi: true,
+    gStart: f.gd + ' ' + MILADI_EN[f.gm-1] + ' ' + f.gy,
+    gEnd: l.gd + ' ' + MILADI_EN[l.gm-1] + ' ' + l.gy
+  
+  
+
+};
+}
+
+function setCalculationInfo(range, timeZone) {
+  var ib = document.getElementById('infoBox');
+  var dateLine = '';
+  if (range && range.isShamsi) {
+    dateLine = '📅 <strong>' + range.monthFa + ' ' + range.jYear + '</strong> — معادل <strong>' + range.gStart + '</strong> تا <strong>' + range.gEnd + '</strong><br>';
+  }
+  ib.innerHTML =
+    dateLine +
+    '<strong>توضیح محاسبات:</strong> این جدول با محاسبات نجومی خورشیدی بر پایهٔ <span class="formula">NREL SPA / NOAA</span> و فرمول‌های <span class="formula">Jean Meeus</span> محاسبه می‌شود. منطقهٔ زمانی شهر به‌صورت <span class="formula">' + timeZone + '</span> اعمال شده است.<br>' +
+    '🌙 <strong>شروع روزه:</strong> <span class="formula">Nautical Twilight = -12°</span>، یعنی خورشید ۱۲ درجه زیر افق صبحگاهی است.<br>' +
+    '🕌 <strong>نماز صبح:</strong> <span class="formula">Blue Hour Start = -8°</span>، یعنی خورشید ۸ درجه زیر افق صبحگاهی است.<br>' +
+    '☀️ <strong>نماز ظهر:</strong> <span class="formula">Solar Noon</span>، زمان عبور مرکز خورشید از نصف‌النهار محل.<br>' +
+    '🕋 <strong>نماز عصر:</strong> نیمهٔ فاصلهٔ <span class="formula">Solar Noon</span> تا <span class="formula">Sunset</span>.<br>' +
+    '🌅 <strong>نماز مغرب:</strong> <span class="formula">Sunset = -0.833°</span> با درنظرگرفتن شکست نور جو و قطر ظاهری خورشید.<br>' +
+    '🌆 <strong>پایان روز:</strong> <span class="formula">Nautical Twilight = -12°</span> در عصر.<br>' +
+    '🌙 <strong>تقسیم شب:</strong> طول شب از <span class="formula">Nautical Twilight</span> عصر تا <span class="formula">Nautical Twilight</span> صبح فردا حساب می‌شود و سپس یک‌سوم شب و دو‌سوم شب محاسبه می‌گردد.<br>' +
+    '🌌 <strong>نماز عشا:</strong> نقطهٔ مقابل ظهر، یعنی <span class="formula">Solar Noon + 12h</span>.';
+  ib.style.display = 'block';
+}
+
+function calculate() {
+  var country  = document.getElementById('country').value;
+  var cityName = document.getElementById('city').value;
+  var monthNum = parseInt(document.getElementById('month').value);
+  if (!country)  { setError('لطفاً ابتدا کشور را انتخاب کنید.'); return; }
+  if (!cityName) { setError('لطفاً شهر را انتخاب کنید.'); return; }
+  setError('');
+
+  var cd = COUNTRIES[country].cities[cityName];
+  var timeZone = cd.tz || COUNTRIES[country].tz;
+  var range = buildDayList(monthNum);
+
+  setCalculationInfo(range, timeZone);
+
+  var title = document.getElementById('tableTitle');
+  var sub = document.getElementById('tableSubtitle');
+  if (range.isShamsi) {
+    title.textContent = 'اوقات شرعی ' + cd.en + ' — ' + range.monthFa + ' ' + range.jYear;
+    sub.textContent = 'معادل ' + range.gStart + ' تا ' + range.gEnd + ' · ' + timeZone;
+  } else {
+    title.textContent = 'اوقات شرعی ' + cd.en + ' — ' + range.monthFa + ' ' + range.year;
+    sub.textContent = timeZone;
+  }
+
+  var tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  range.days.forEach(function(dayInfo) {
+    var s = sunCalc(dayInfo.gy, dayInfo.gm, dayInfo.gd, cd.lat, cd.lng, timeZone);
+
+    // طول شب: از Nautical Twilight عصر تا Nautical Twilight صبح فردا
+    var tomorrowDate = new Date(dayInfo.gy, dayInfo.gm - 1, dayInfo.gd + 1);
+    var sTomorrow = sunCalc(
+      tomorrowDate.getFullYear(),
+      tomorrowDate.getMonth() + 1,
+      tomorrowDate.getDate(),
+      cd.lat,
+      cd.lng,
+      timeZone
+    );
+
+    var noonLocal = s.noon;
+    var sunsetLocal = s.set;
+    var asrMin = (noonLocal !== null && sunsetLocal !== null) ? noonLocal + (sunsetLocal - noonLocal) / 2 : null;
+    var ishaMin = (noonLocal !== null) ? noonLocal + 720 : null;
+
+    var nightStart = s.nautEve;
+    var nextFastStart = sTomorrow.nautMorn;
+    var nightLength = (nightStart !== null && nextFastStart !== null) ? (nextFastStart + 1440 - nightStart) : null;
+    var nightOneThird = nightLength !== null ? nightStart + nightLength / 3 : null;
+    var nightHalf = nightLength !== null ? nightStart + nightLength / 2 : null;
+    var nightTwoThirds = nightLength !== null ? nightStart + (2 * nightLength / 3) : null;
+
+    var dayLabel = range.isShamsi ? dayInfo.dayNum + ' ' + SHAMSI_MONTHS[monthNum-1].slice(0,3) : String(dayInfo.dayNum);
+
+    var tr = document.createElement('tr');
+    var today = new Date();
+    if (dayInfo.gy === today.getFullYear() && dayInfo.gm === today.getMonth() + 1 && dayInfo.gd === today.getDate()) {
+      tr.className = 'today-row';
+    }
+    tr.innerHTML =
+      '<td class="day-col">'  + dayLabel + '</td>' +
+      '<td class="date-col">' + dayInfo.label + '</td>' +
+      '<td class="time-col" data-prayer="fastStart">' + fmtMin(s.nautMorn) + '</td>' +
+      '<td class="time-col" data-prayer="fajr">' + fmtMin(s.blueMorn) + '</td>' +
+      '<td class="time-col" data-prayer="noon">' + fmtMin(noonLocal) + '</td>' +
+      '<td class="time-col asr-col" data-prayer="asr">' + fmtMin(asrMin) + '</td>' +
+      '<td class="time-col" data-prayer="maghrib">' + fmtMin(sunsetLocal) + '</td>' +
+      '<td class="time-col" data-prayer="dayEnd">' + fmtMin(s.nautEve) + '</td>' +
+      '<td class="time-col" data-prayer="nightThird">' + fmtMin(nightOneThird) + '</td>' +
+      '<td class="time-col isha-col" data-prayer="isha">' + fmtMin(ishaMin) + '</td>' +
+      '<td class="time-col" data-prayer="nightTwoThirds">' + fmtMin(nightTwoThirds) + '</td>';
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('tableWrapper').style.display = 'block';
+  scheduleTodayNotifications();
+}
+
+function setError(msg) {
+  var el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+
+// ══════════════════════════════════════════
+//  PRINT / PDF + PWA + NOTIFICATIONS
+// ══════════════════════════════════════════
+var deferredInstallPrompt = null;
+var notificationTimers = [];
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  var hint = document.getElementById('installHint');
+  if (hint) hint.classList.add('show');
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('oghat_sw.js').catch(function(){});
+  });
+}
+
+function printMonthPDF(){
+  if (document.getElementById('tableWrapper').style.display !== 'block') {
+    calculate();
+  }
+  setTimeout(function(){ window.print(); }, 150);
+}
+
+async function installPWA(){
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+  } else {
+    var hint = document.getElementById('installHint');
+    if (hint) hint.classList.add('show');
+  }
+}
+
+function toggleNotifyPanel(){
+  var panel = document.getElementById('notifyPanel');
+  if (!panel) return;
+  panel.classList.toggle('show');
+  loadNotificationSettings();
+}
+
+function loadNotificationSettings(){
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem('oghatNotifySettings') || '{}'); } catch(e) {}
+  document.querySelectorAll('[data-notify]').forEach(function(cb){
+    cb.checked = !!saved[cb.getAttribute('data-notify')];
+  });
+}
+
+async function saveNotificationSettings(){
+  var settings = {};
+  document.querySelectorAll('[data-notify]').forEach(function(cb){
+    settings[cb.getAttribute('data-notify')] = cb.checked;
+  });
+  localStorage.setItem('oghatNotifySettings', JSON.stringify(settings));
+
+  if (Object.values(settings).some(Boolean)) {
+    if (!('Notification' in window)) {
+      document.getElementById('notifyStatus').textContent = 'این مرورگر Notification را پشتیبانی نمی‌کند.';
+      return;
+    }
+    if (Notification.permission !== 'granted') {
+      var perm = await Notification.requestPermission();
+      if (perm !== 'granted') {
+        document.getElementById('notifyStatus').textContent = 'اجازه Notification داده نشد.';
+        return;
+      }
+    }
+  }
+  document.getElementById('notifyStatus').textContent = 'یادآورها ذخیره شدند.';
+  scheduleTodayNotifications();
+}
+
+function clearNotificationTimers(){
+  notificationTimers.forEach(function(t){ clearTimeout(t); });
+  notificationTimers = [];
+}
+
+function timeTextToMinutes(t){
+  if (!t || t === '–') return null;
+  var parts = t.trim().split(':');
+  if (parts.length !== 2) return null;
+  return parseInt(parts[0],10) * 60 + parseInt(parts[1],10);
+}
+
+function notifyLabel(key){
+  return {
+    fastStart:'شروع روزه',
+    fajr:'نماز صبح',
+    noon:'نماز ظهر',
+    asr:'نماز عصر',
+    maghrib:'نماز مغرب',
+    dayEnd:'پایان روز',
+    nightThird:'یک‌سوم شب',
+    isha:'نماز عشا',
+    nightTwoThirds:'دو‌سوم شب'
+  }[key] || key;
+}
+
+function showPrayerNotification(key, timeText){
+  var title = notifyLabel(key);
+  var body = title + ' — ساعت ' + timeText;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(function(reg){
+      reg.showNotification(title, {
+        body: body,
+        icon: 'oghat_icon.svg',
+        badge: 'oghat_icon.svg',
+        tag: 'oghat-' + key,
+        renotify: true
+      });
+    }).catch(function(){
+      new Notification(title, { body: body });
+    });
+  } else if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body: body });
+  }
+}
+
+function scheduleTodayNotifications(){
+  clearNotificationTimers();
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem('oghatNotifySettings') || '{}'); } catch(e) {}
+  if (!Object.values(saved).some(Boolean)) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  var todayRow = document.querySelector('tr.today-row');
+  if (!todayRow) return;
+
+  var now = new Date();
+  var nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds()/60;
+
+  Object.keys(saved).forEach(function(key){
+    if (!saved[key]) return;
+    var cell = todayRow.querySelector('[data-prayer="' + key + '"]');
+    if (!cell) return;
+    var timeText = cell.textContent.trim();
+    var targetMin = timeTextToMinutes(timeText);
+    if (targetMin === null) return;
+
+    var diffMin = targetMin - nowMin;
+    if (diffMin <= 0) return;
+
+    var timer = setTimeout(function(){
+      showPrayerNotification(key, timeText);
+    }, diffMin * 60 * 1000);
+
+    notificationTimers.push(timer);
+  });
+}
+
+window.addEventListener('load', loadNotificationSettings);
+
+
+populateCountries();
+populateMonths();
+</script>
+</body>
+</html>

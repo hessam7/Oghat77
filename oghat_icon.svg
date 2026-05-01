@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="108" fill="#2c1a06"/>
+  <circle cx="256" cy="256" r="178" fill="none" stroke="#c8941a" stroke-width="18"/>
+  <path d="M314 124c-54 20-92 72-92 132s38 112 92 132c-84 8-158-58-158-132s74-140 158-132z" fill="#e8b84b"/>
+  <circle cx="342" cy="176" r="16" fill="#e8b84b"/>
+  <text x="256" y="405" text-anchor="middle" font-family="serif" font-size="58" fill="#f5edd6">وقت</text>
+</svg>
